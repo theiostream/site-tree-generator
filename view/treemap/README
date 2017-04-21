@@ -1,0 +1,14 @@
+This is a shameless (and terribly written) modification of the "Sequences Sunburst"
+d3.js block, written by Kerry Rodden and licensed under the Apache License.
+
+Reference: https://bl.ocks.org/kerryrodden/7090426
+
+INSTRUCTIONS
+1. Plug in an enabled-dates.json file with all CSVs available from datasets.
+An nice way for generating it can be:
+
+$ ls -1 csv | jq -R -s -c 'split("\n")' >enabled-dates.json
+
+2. Plug in a csv/ directory with all CSV entries. Each one should
+have the YYYYMMDD.csv format.
+
