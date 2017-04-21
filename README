@@ -1,0 +1,6 @@
+sitemap-generator
+
+This project takes a website crawl and creates a sequence CSV for
+usage with a d3.js Sequences Sunburst.
+
+Licensed under the GNU General Public License, version 3.
