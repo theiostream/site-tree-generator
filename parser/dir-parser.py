@@ -10,24 +10,41 @@ def build_csv(base_dir, snapshot):
     passed = []
 
     for root, dirs, files in os.walk(base_dir):
+        file_name = ''
         file_size = 0
         try:
-            file_size = path.getsize(path.join(root, snapshot + '.snapshot'))
+            file_name = path.join(root, snapshot + '.snapshot')
+            file_size = path.getsize(file_name)
         except FileNotFoundError:
-            success = False
-            for idx, f in enumerate(files):
-                if idx > 0 and int(f.split('.')[0]) > int(snapshot):
-                    fallback = files[idx - 1]
-                    file_size = path.getsize(path.join(root, fallback))
-
-                    success = True
-                    break
-            if not success:
+            if len(files) == 0:
                 stderr.write('Could not find any crawl for ' + root + '\n')
                 continue
 
+            failure = False
+            broke_early = False
+            for idx, f in enumerate(sorted(files)):
+                file_is_more_recent = int(f.split('.')[0]) > int(snapshot)
+                #stderr.write('debug: Comparing ' + f + ' with ' + snapshot + '\n')
+                if idx == 0 and file_is_more_recent:
+                    stderr.write('Could not find any crawl for ' + root + '\n')
+                    failure = True
+                    break
+                elif file_is_more_recent:
+                    file_name = files[idx - 1]
+                    file_size = path.getsize(path.join(root, file_name))
+                    broke_early = True
+                    break
+
+            if failure:
+                continue
+
+            if not broke_early:
+                file_name = files[-1]
+                file_size = path.getsize(path.join(root, file_name))
+
         root = path.relpath(root, base_dir)
-        #print('=== DEBUG: ' + root)
+        stderr.write('debug: getting file ' + file_name + '\n')
+
         path_components = root.split('/')
         path_components[:] = [re.sub(r'[^a-zA-Z0-9 _]', '', p) for p in path_components]
         csv_path = '-'.join(path_components)
